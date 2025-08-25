@@ -1,1 +1,67 @@
+Q1. Provide the list of markets in which customer "Atliq Exclusive" operates its business in the APAC region.
+
+SELECT DISTINCT market
+FROM dim_customer
+WHERE
+customer = 'Atliq Exclusive' AND region = 'APAC';
+
+
+Q2. What is the percentage of unique product increase in 2021 vs. 2020? The final output contains these fields,
+-- unique_products_2020, unique_products_2021, percentage_chg
+
+with cte1 as(select
+count(distinct (case when fiscal_year='2020' then product_code end)) as 2020_total,
+count(distinct (case when fiscal_year='2021' then product_code end)) as 2021_total
+from fact_sales_monthly)
+SELECT 2020_total,2021_total,
+ROUND(((2021_total - 2020_total) / 2020_total) * 100,2) AS pct_chg
+FROM cte1;
+
+
+Q3. Provide a report with all the unique product counts for each segment and
+sort them in descending order of product counts. The final output contains 2 fields, segment, product_count
+
+SELECT DISTINCT segment, COUNT(DISTINCT product_code) as total_products
+FROM dim_product
+group by segment
+order by total_products desc;
+
+
+Q4. Follow-up: Which segment had the most increase in unique products in
+2021 vs 2020? The final output contains these fields,
+segment, product_count_2020, product_count_20, difference
+
+with cte1 as(select dp.segment,fsm.product_code,fsm.fiscal_year from fact_sales_monthly fsm
+join dim_product dp
+on dp.product_code=fsm.product_code),
+cte2 as(select distinct segment,
+count(distinct case when fiscal_year='2020' then product_code end) as 2020_total,
+count(distinct case when fiscal_year='2021' then product_code end) as 2021_total
+from cte1
+group by segment)
+select *,2021_total-2020_total as product_change from cte2;
+
+
+Q5. Get the products that have the highest and lowest manufacturing costs.The final output should contain these fields,
+product_code, product, manufacturing_cost
+
+select 
+fmc.product_code,dp.product,fmc.manufacturing_cost from fact_manufacturing_cost fmc
+join dim_product dp on dp.product_code=fmc.product_code 
+where manufacturing_cost=(select min(manufacturing_cost) from fact_manufacturing_cost)
+
+union all
+
+select fmc.product_code,dp.product,fmc.manufacturing_cost from fact_manufacturing_cost fmc
+ join dim_product dp on dp.product_code=fmc.product_code 
+ where manufacturing_cost=(select max(manufacturing_cost) from fact_manufacturing_cost);
+
+
+
+
+
+
+
+
+
 
