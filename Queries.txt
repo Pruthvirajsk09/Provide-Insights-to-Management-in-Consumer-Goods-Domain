@@ -1,10 +1,11 @@
-# Q1. Provide the list of markets in which customer "Atliq Exclusive" operates its business in the APAC region.
+Q1. Provide the list of markets in which customer "Atliq Exclusive" operates its business in the APAC region.
 
 SELECT DISTINCT market
 FROM dim_customer
 WHERE
 customer = 'Atliq Exclusive' AND region = 'APAC';
 
+-----------------------------------------------------------------------------------------------------------------------------------------------
 
 Q2. What is the percentage of unique product increase in 2021 vs. 2020? The final output contains these fields,
 -- unique_products_2020, unique_products_2021, percentage_chg
@@ -17,6 +18,7 @@ SELECT 2020_total,2021_total,
 ROUND(((2021_total - 2020_total) / 2020_total) * 100,2) AS pct_chg
 FROM cte1;
 
+-----------------------------------------------------------------------------------------------------------------------------------------------
 
 Q3. Provide a report with all the unique product counts for each segment and
 sort them in descending order of product counts. The final output contains 2 fields, segment, product_count
@@ -26,6 +28,7 @@ FROM dim_product
 group by segment
 order by total_products desc;
 
+-----------------------------------------------------------------------------------------------------------------------------------------------
 
 Q4. Follow-up: Which segment had the most increase in unique products in
 2021 vs 2020? The final output contains these fields,
@@ -41,6 +44,7 @@ from cte1
 group by segment)
 select *,2021_total-2020_total as product_change from cte2;
 
+-----------------------------------------------------------------------------------------------------------------------------------------------
 
 Q5. Get the products that have the highest and lowest manufacturing costs.The final output should contain these fields,
 product_code, product, manufacturing_cost
@@ -56,6 +60,7 @@ select fmc.product_code,dp.product,fmc.manufacturing_cost from fact_manufacturin
  join dim_product dp on dp.product_code=fmc.product_code 
  where manufacturing_cost=(select max(manufacturing_cost) from fact_manufacturing_cost);
 
+-----------------------------------------------------------------------------------------------------------------------------------------------
 
 Q6. Generate a report which contains the top 5 customers who received an
  average high pre_invoice_discount_pct for the fiscal year 2021 and in the Indian market.
@@ -70,6 +75,7 @@ select customer_code,customer,round(avg(pre_invoice_discount_pct)*100,2) as avg_
 from cte1 group by customer_code,customer
 order by avg_discount desc limit 5;
 
+-----------------------------------------------------------------------------------------------------------------------------------------------
 
 Q7. Get the complete report of the Gross sales amount for the customer “Atliq
 Exclusive” for each month. This analysis helps to get an idea of low and
@@ -94,6 +100,7 @@ select month,fiscal_year,round(sum(gross_price),2) as Gross_Sales_Amount
 from cte2
 group by month,fiscal_year;
 
+-----------------------------------------------------------------------------------------------------------------------------------------------
 
 Q8. In which quarter of 2020, got the maximum total_sold_quantity?
 The final output contains these fields sorted by the 
@@ -111,6 +118,7 @@ from fact_sales_monthly
 where fiscal_year='2020'
 group by Quarter;
 
+-----------------------------------------------------------------------------------------------------------------------------------------------
 
 Q9. Which channel helped to bring more gross sales in the fiscal year 2021
 and the percentage of contribution? The final output contains these fields,
@@ -127,9 +135,10 @@ from dim_customer dc join
 cte1 c1 on c1.customer_code=dc.customer_code
 group by dc.channel;
 
+-----------------------------------------------------------------------------------------------------------------------------------------------
 
--- 10. Get the Top 3 products in each division that have a high
--- total_sold_quantity in the fiscal_year 2021? The final output contains these fields,
+Q10. Get the Top 3 products in each division that have a high
+total_sold_quantity in the fiscal_year 2021? The final output contains these fields,
 division, product_code, product, total_sold_quantity, rank_order
 
 with cte1 as(select dp.division,sm.product_code,product,sold_quantity from fact_sales_monthly sm
@@ -143,3 +152,4 @@ from cte2)
 
 select * from cte3 where rnk<=3;
 
+-----------------------------------------------------------------------------------------------------------------------------------------------
